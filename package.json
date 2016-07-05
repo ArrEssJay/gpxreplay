@@ -1,0 +1,25 @@
+{
+  "name": "gpxreplay",
+  "version": "1.0.0",
+  "description": "Output waypoints from a GPX tracklog in real-time",
+  "main": "gpxreplay.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "gps",
+    "gpx",
+    "geodesy"
+  ],
+  "dependencies": {
+    "geodesy": "^1.1.0",
+    "gpx-parse": "^0.10.4"
+  },
+  "author": "Rob Jones <rob@robjones.org>",
+  "license": "CC-BY-4.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/robdebagel/gpxreplay"
+  },
+  "bugs": "https://github.com/robdebagel/gpxreplay/issues"
+}
