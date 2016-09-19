@@ -5,18 +5,18 @@
  * @version 1.0.0
  */
 
-var gpxParse = require("gpx-parse");
+var gpxParse = require('gpx-parse');
 var LatLon = require('geodesy').LatLonEllipsoidal;
 var fs = require('fs');
 
 var options = {
-  rate : 1,
-  loop : false,
-  limitWait : -1,
-  precision : -1
+  rate: 1,
+  loop: false,
+  limitWait: -1,
+  precision: -1
 };
 
-var precisionIterator = function (obj, stack) {
+var precisionIterator = function(obj, stack) {
   for (var property in obj) {
     if (obj.hasOwnProperty(property)) {
       if (typeof obj[property] == "object") {
@@ -31,9 +31,10 @@ var precisionIterator = function (obj, stack) {
 var sendData = function(data, callback) {
   var len = data.length;
   var delay = 0;
-  data.forEach(function (currentValue, index, array){
-    delay = delay + currentValue.delay; //all timers are created at the same time so add
-    setTimeout(function(x){
+  data.forEach(function(currentValue, index, array) {
+    //all timers are created at the same time so add
+    delay = delay + currentValue.delay;
+    setTimeout(function(x) {
       return function() {
         callback(currentValue.data);
         if (options.loop && index == len - 1) sendData(data, callback); //loop
@@ -53,35 +54,35 @@ var playGPX = function(data, callback) {
   var totalTime = 0;
   var meanVelocity = 0;
   for (var i = 0; i < tlen - 1; i++) { //we always need a next-segment
-    var tp1 = tseg[i], tp2 = tseg[i+1];
+    var tp1 = tseg[i], tp2 = tseg[i + 1];
     var p1 = new LatLon(tp1.lat, tp1.lon);
     var p2 = new LatLon(tp2.lat, tp2.lon);
     var t = Date.parse(tp2.time) - Date.parse(tp1.time);
-    totalTime = totalTime + t/1000;
+    totalTime = totalTime + t / 1000;
     var d = p1.distanceTo(p2);
     var v = 3600 * d / t;
-    meanVelocity = ( meanVelocity + v )/2;
+    meanVelocity = (meanVelocity + v) / 2;
     var b = p1.initialBearingTo(p2);
 
     //if requested, set the max time between waypoints
     //rate divider sets playback speed
-    var delay = ((options.limitWait > 0) ? (t > options.limitWait ? options.limitWait : t) : t)/options.rate;
+    var delay = ((options.limitWait > 0) ? (t > options.limitWait ? options.limitWait : t) : t) / options.rate;
 
-    op = {
-      'data': {
-        'lon': tp2.lon,
-        'lat': tp2.lat,
-        'fromPrevious' :{
-          'bearing': b,
-          'velocity': v,
-          'time': t/1000
+    var op = {
+      data: {
+        lon: tp2.lon,
+        lat: tp2.lat,
+        fromPrevious: {
+          bearing: b,
+          velocity: v,
+          time: t / 1000
         },
-        'toCurrent' : {
-          'time': totalTime,
-          'meanVelocity': meanVelocity
+        toCurrent: {
+          time: totalTime,
+          meanVelocity: meanVelocity
         }
       },
-      'delay': delay
+      delay: delay
     };
 
     //if elevation included in legs, use straight line approximation
@@ -99,7 +100,7 @@ var playGPX = function(data, callback) {
     op.data.toCurrent.distance = totalDistance;
 
     //limit precision
-    if (options.precision >=0){
+    if (options.precision >= 0) {
       precisionIterator(op, '');
     }
     trackData.push(op);
@@ -122,8 +123,8 @@ playTrack = function(file, callback, _options) {
     if (typeof file != 'string') return;
 
     //parse optional args
-    for (var op in _options){
-      if (op in options && typeof(options[op]) === typeof(_options[op])){
+    for (var op in _options) {
+      if (op in options && typeof(options[op]) === typeof(_options[op])) {
         if (typeof(_options[op]) === 'number' && _options[op] < 0) break;
         options[op] = _options[op];
       }
