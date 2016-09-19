@@ -9,8 +9,6 @@ var gpxParse = require("gpx-parse");
 var LatLon = require('geodesy').LatLonEllipsoidal;
 var fs = require('fs');
 
-var trackData = [];
-var callback = null;
 var options = {
   rate : 1,
   loop : false,
@@ -30,7 +28,7 @@ var precisionIterator = function (obj, stack) {
   }
 };
 
-var sendData = function(data){
+var sendData = function(data, callback) {
   var len = data.length;
   var delay = 0;
   data.forEach(function (currentValue, index, array){
@@ -38,21 +36,17 @@ var sendData = function(data){
     setTimeout(function(x){
       return function() {
         callback(currentValue.data);
-        if (options.loop && index == len-1) sendData(data); //loop
+        if (options.loop && index == len - 1) sendData(data, callback); //loop
       };
     }(currentValue), delay);
   });
 };
 
-var playGPX = function (error, data) {
-  if (error){
-    console.log("Error: ");
-    console.log(error);
-    return;
-  }
+var playGPX = function(data, callback) {
   var track = (data.tracks[0]);
   var tseg = track.segments[0];
   var tlen = tseg.length;
+  var trackData = [];
 
   var totalDistance = 0;
   var totalClimb = 0;
@@ -110,7 +104,7 @@ var playGPX = function (error, data) {
     }
     trackData.push(op);
   }
-  sendData(trackData);
+  sendData(trackData, callback);
 };
 
 /**
@@ -124,8 +118,7 @@ var playGPX = function (error, data) {
  * @param   {function} callback - Callback method
  * @param   {function} options - Optional arguments
  */
-playTrack = function(file, _callback, _options) {
-    if (typeof _callback === 'function') callback = _callback; else return;
+playTrack = function(file, callback, _options) {
     if (typeof file != 'string') return;
 
     //parse optional args
@@ -136,11 +129,21 @@ playTrack = function(file, _callback, _options) {
       }
     }
 
+    var parseHandler = function(error, data) {
+      if (error) {
+        console.log("Error: ");
+        console.log(error);
+        return;
+      }
+
+      playGPX(data, callback);
+    };
+
     fs.lstat(file, function(err, stat) {
       if (stat && stat.isFile()) {
-        gpxParse.parseGpxFromFile(file, playGPX);
+        gpxParse.parseGpxFromFile(file, parseHandler);
       } else {
-        gpxParse.parseGpx(file, playGPX);
+        gpxParse.parseGpx(file, parseHandler);
       }
     });
 };
