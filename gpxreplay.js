@@ -7,6 +7,7 @@
 
 var gpxParse = require("gpx-parse");
 var LatLon = require('geodesy').LatLonEllipsoidal;
+var fs = require('fs');
 
 var trackData = [];
 var callback = null;
@@ -134,7 +135,14 @@ playTrack = function(file, _callback, _options) {
         options[op] = _options[op];
       }
     }
-    gpxParse.parseGpxFromFile(file, playGPX);
+
+    fs.lstat(file, function(err, stat) {
+      if (stat && stat.isFile()) {
+        gpxParse.parseGpxFromFile(file, playGPX);
+      } else {
+        gpxParse.parseGpx(file, playGPX);
+      }
+    });
 };
 
 if (typeof module != 'undefined' && module.exports) module.exports.playTrack = playTrack;
