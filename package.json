@@ -1,5 +1,5 @@
 {
-  "name": "gpxreplay",
+  "name": "@palleter/gpxreplay",
   "version": "1.0.0",
   "description": "Output waypoints from a GPX tracklog in real-time",
   "main": "gpxreplay.js",
