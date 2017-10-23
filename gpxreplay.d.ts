@@ -1,4 +1,4 @@
-declare module 'gpxreplay' {
+declare module '@palleter/gpxreplay' {
 
   interface Point {
     lon: number;
