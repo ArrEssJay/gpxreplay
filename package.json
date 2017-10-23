@@ -1,8 +1,9 @@
 {
-  "name": "gpxreplay",
-  "version": "1.0.0",
+  "name": "@palleter/gpxreplay",
+  "version": "1.0.1",
   "description": "Output waypoints from a GPX tracklog in real-time",
   "main": "gpxreplay.js",
+  "types": "gpxreplay.d.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
